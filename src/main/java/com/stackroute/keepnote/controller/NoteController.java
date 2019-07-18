@@ -7,12 +7,15 @@ package com.stackroute.keepnote.controller;
 
 import com.stackroute.keepnote.model.Note;
 import com.stackroute.keepnote.repository.NoteRepository;
+
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -45,9 +48,10 @@ public class NoteController {
 	 * for use when building model data for use with views. it should map to the default URL i.e. "/" */
 	@RequestMapping("/")
 	public ModelAndView getAllNotes()
-	{   ApplicationContext applicationContext = new ClassPathXmlApplicationContext("beans.xml");
-		this.note = applicationContext.getBean(Note.class);
-		this.noteRepository = applicationContext.getBean(NoteRepository.class);
+	{
+		ApplicationContext context=new AnnotationConfigApplicationContext("com.stackroute.keepnote.config.DispatcherConfig");
+		this.note = context.getBean(Note.class);
+		this.noteRepository = context.getBean(NoteRepository.class);
       //noteRepository.getAllNotes();
 		ModelAndView mv=new ModelAndView("index");
 		mv.addObject("list",noteRepository.getAllNotes());
@@ -66,15 +70,15 @@ public class NoteController {
 	public ModelAndView addNote(@RequestParam("noteId")int noteId,@RequestParam("noteTitle")String title,
 					   @RequestParam("noteContent")String content,@RequestParam("noteStatus")String status)
 	{   ModelAndView mv=new ModelAndView();
-	    ApplicationContext applicationContext=new ClassPathXmlApplicationContext("beans.xml");
-	    Note note=applicationContext.getBean("note",Note.class);
-	    NoteRepository noteRepository=applicationContext.getBean("noteRepository",NoteRepository.class);
+		ApplicationContext context=new AnnotationConfigApplicationContext("com.stackroute.keepnote.config.DispatcherConfig");
+		this.note = context.getBean(Note.class);
+		this.noteRepository = context.getBean(NoteRepository.class);
 	    note.setNoteContent(content);
 	   	note.setNoteId(noteId);
 	   	note.setNoteTitle(title);
 	   	note.setNoteStatus(status);
 	   	noteRepository.addNote(note);
-		System.out.println(note);
+		//System.out.println(note);
        mv.addObject("note",note);
        mv.addObject("noterepo",noteRepository.getAllNotes());
        mv.setViewName("index");
@@ -88,9 +92,9 @@ public class NoteController {
 	@RequestMapping("/deleteNote")
 	public ModelAndView delete(@RequestParam("noteId")int noteId)
 	{ ModelAndView mv=new ModelAndView();
-		ApplicationContext applicationContext=new ClassPathXmlApplicationContext("beans.xml");
-		Note note=applicationContext.getBean("note",Note.class);
-		NoteRepository noteRepository=applicationContext.getBean("noteRepository",NoteRepository.class);
+		ApplicationContext context=new AnnotationConfigApplicationContext("com.stackroute.keepnote.config.DispatcherConfig");
+		this.note = context.getBean(Note.class);
+		this.noteRepository = context.getBean(NoteRepository.class);
 		noteRepository.deleteNote(noteId);
 		mv.addObject("noteRepository",noteRepository.getAllNotes());
 		mv.setViewName("redirect:/");
